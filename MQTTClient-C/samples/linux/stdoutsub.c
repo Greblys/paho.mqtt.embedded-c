@@ -41,6 +41,7 @@
 
 */
 #include <stdio.h>
+#include "MQTTLinux.h"
 #include "MQTTClient.h"
 
 #include <stdio.h>
@@ -210,14 +211,14 @@ int main(int argc, char** argv)
 	getopts(argc, argv);	
 
 	Network n;
-	Client c;
+	MQTTClient c;
 
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 
 	NewNetwork(&n);
 	ConnectNetwork(&n, opts.host, opts.port);
-	MQTTClient(&c, &n, 1000, buf, 100, readbuf, 100);
+	MQTTClientInit(&c, &n, 1000, buf, 100, readbuf, 100);
  
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;       
 	data.willFlag = 0;
@@ -245,7 +246,7 @@ int main(int argc, char** argv)
 	printf("Stopping\n");
 
 	MQTTDisconnect(&c);
-	n.disconnect(&n);
+	NetworkDisconnect(&n);
 
 	return 0;
 }

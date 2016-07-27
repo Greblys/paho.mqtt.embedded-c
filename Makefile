@@ -37,12 +37,11 @@ ifndef exec_prefix
 endif
 
 bindir = $(exec_prefix)/bin
-includedir = $(prefix)/include
+includedir = $(prefix)/include/paho-mqtt-embed-c
 libdir = $(exec_prefix)/lib
 
-SOURCE_FILES_C = $(srcdir)/*.c
-
-HEADERS = $(srcdir)/*.h
+SOURCE_FILES_C = $(srcdir)/*.c MQTTClient-C/src/linux/*.c MQTTClient-C/src/*.c
+HEADERS_C = $(srcdir)/*.h MQTTClient-C/src/linux/*.h MQTTClient-C/src/*.h
 
 
 SAMPLE_FILES_C = pub0sub1 qos0pub
@@ -102,8 +101,8 @@ ${SYNC_TESTS}: ${blddir}/test/%: ${srcdir}/../test/%.c
 	${CC} -g -o ${blddir}/test/${basename ${+F}} $< -l${MQTT_EMBED_LIB_C} ${FLAGS_EXE}
 
 
-${SYNC_SAMPLES}: ${blddir}/samples/%: ${srcdir}/../samples/%.c
-	${CC} -o ${blddir}/samples/${basename ${+F}} $< -l${MQTT_EMBED_LIB_C} ${FLAGS_EXE}
+${SYNC_SAMPLES}: ${blddir}/samples/%: ${srcdir}/../samples/%.c ${srcdir}/../samples/transport.o
+	${CC} -o $@ $^ -l${MQTT_EMBED_LIB_C} ${FLAGS_EXE}
 
 
 
@@ -124,6 +123,8 @@ install: build
 
 	/sbin/ldconfig $(DESTDIR)${libdir}
 	ln -s lib$(MQTT_EMBED_LIB_C).so.${MAJOR_VERSION} $(DESTDIR)${libdir}/lib$(MQTT_EMBED_LIB_C).so
+	mkdir ${includedir}
+	cp ${HEADERS_C} ${includedir} 
 
 
 uninstall:
@@ -131,6 +132,7 @@ uninstall:
 
 	/sbin/ldconfig $(DESTDIR)${libdir}
 	rm $(DESTDIR)${libdir}/lib$(MQTT_EMBED_LIB_C).so
+	rm -r ${includedir}
 
 
 html:
